@@ -1,3 +1,7 @@
+"""
+Handles OCR functionalities, and extractions
+"""
+
 from fastapi import APIRouter, HTTPException, UploadFile
 
 from serializers.commons import GenericErrorResp
@@ -9,6 +13,7 @@ from validators.ocrs import validate_files
 # Take Home Assignment's instructions for now.
 router = APIRouter(
     # prefix="/ocr",
+    tags=["ocr"],
 )
 
 
