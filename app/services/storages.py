@@ -1,16 +1,47 @@
 import logging
-from typing import IO, Union
+from hashlib import md5
+from typing import BinaryIO, Union
+
 import boto3
+from botocore.client import Config
 from botocore.exceptions import ClientError
 from fastapi import UploadFile
 import nanoid
+from pydantic import validate_call
+
 from db.uploads import IUploads, insert_upload
 from serializers.ocrs import FileMeta
 from services.env_man import ENVS
-from hashlib import md5
 
 
-def upload_file(bucket: str, key: str, f: IO) -> bool:
+@validate_call
+def get_signed_url(bucket: str, key: str, expires_in: int = 3600) -> str:
+    """
+    Generate a signed url for a file
+    Args:
+        bucket: Bucket name
+        key: S3 object name
+        expires_in: Expiry time in seconds
+    """
+    client = boto3.client(
+        "s3",
+        config=Config(
+            signature_version="v4",
+            s3={
+                "addressing_style": "path",
+            },
+        ),
+    )
+    url = client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": bucket, "Key": key},
+        ExpiresIn=expires_in,
+    )
+
+    return url
+
+
+def upload_file(bucket: str, key: str, f: BinaryIO) -> bool:
     """
     Upload a file to an S3 bucket
     Args:
@@ -28,6 +59,7 @@ def upload_file(bucket: str, key: str, f: IO) -> bool:
     return True
 
 
+@validate_call
 def gen_file_url(bucket: str, key: str) -> str:
     """
     Generate a public file url
@@ -40,6 +72,7 @@ def gen_file_url(bucket: str, key: str) -> str:
     return f"{bucket_url}/{bucket}/{key}"
 
 
+@validate_call
 def handle_file_upload(
     f: UploadFile,
     user_id: str,
@@ -80,6 +113,8 @@ def handle_file_upload(
         schema_version=1,
     )
     insert_upload(db_payload)
-    ret = FileMeta(**db_payload.model_dump())
+    file_meta = db_payload.model_dump()
+    file_meta["url"] = get_signed_url(ENVS["AWS_BUCKET_NAME"], key)
+    ret = FileMeta(**file_meta)
 
     return ret
