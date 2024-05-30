@@ -2,6 +2,7 @@
 Handles OCR functionalities, and extractions
 """
 
+import asyncio
 from fastapi import APIRouter, HTTPException, UploadFile
 
 from serializers.commons import GenericErrorResp
@@ -50,16 +51,15 @@ async def post_upload(
     # user_id = get_user_id()
     validate_files(files)
 
-    ret = []
-    # FIXME: optimize this
-    for file in files:
-        resp = handle_file_upload(file, "user_id")
-        ret.append(resp)
+    async def _task(file, user_id):
+        return handle_file_upload(file, user_id)
 
-    if not all(ret):
+    res = await asyncio.gather(*[_task(file, "user_id") for file in files])
+
+    if not all(res):
         raise HTTPException(
             status_code=500,
             detail="Failed to upload file(s) to s3",
         )
 
-    return UploadPostOut(files=ret)
+    return UploadPostOut(files=res)
