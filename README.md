@@ -1,2 +1,0 @@
-# gateway-challenge
-Gateway Challenge

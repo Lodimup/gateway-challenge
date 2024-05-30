@@ -1,0 +1,39 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/postgres
+{
+	"name": "gateway-challenge",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"features": {
+		"ghcr.io/devcontainers-contrib/features/poetry:2": {}
+	},
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or the host.
+	"forwardPorts": ["mongo:27017", "redis:6379"],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "chmod +x .devcontainer/post-create.sh && .devcontainer/post-create.sh ${containerWorkspaceFolder}",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"mongodb.mongodb-vscode",
+				"ms-python.flake8",
+				"GitHub.copilot-chat",
+				"charliermarsh.ruff",
+				"ms-python.black-formatter",
+				"njpwerner.autodocstring",
+				"ms-python.python"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

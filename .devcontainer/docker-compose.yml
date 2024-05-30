@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+
+    volumes:
+      - ../..:/workspaces:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+
+  # 27017 default port for MongoDB
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+
+  # 6379 default port for Redis
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:
