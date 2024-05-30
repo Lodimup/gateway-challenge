@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile
+from fastapi import APIRouter, HTTPException, UploadFile
 
 from serializers.commons import GenericErrorResp
 from serializers.ocrs import UploadPostOut
@@ -18,6 +18,7 @@ router = APIRouter(
         200: {"model": UploadPostOut},
         413: {"model": GenericErrorResp},
         406: {"model": GenericErrorResp},
+        500: {"model": GenericErrorResp},
     },
 )
 async def post_upload(
@@ -49,5 +50,11 @@ async def post_upload(
     for file in files:
         resp = handle_file_upload(file, "user_id")
         ret.append(resp)
+
+    if not all(ret):
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to upload file(s) to s3",
+        )
 
     return UploadPostOut(files=ret)
