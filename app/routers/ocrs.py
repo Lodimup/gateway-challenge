@@ -3,10 +3,12 @@ Handles OCR functionalities, and extractions
 """
 
 import asyncio
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from serializers.commons import GenericErrorResp
 from serializers.ocrs import UploadPostOut
+from services.auths import User, get_current_active_user
 from services.storages import handle_file_upload
 from validators.ocrs import validate_files
 
@@ -28,6 +30,7 @@ router = APIRouter(
     },
 )
 async def post_upload(
+    current_user: Annotated[User, Depends(get_current_active_user)],
     files: list[UploadFile],
 ) -> UploadPostOut:
     """
@@ -47,14 +50,17 @@ async def post_upload(
     - Upload the file to a S3 bucket
     - Store file's metadata in mongodb
     """
-    # auth
-    # user_id = get_user_id()
+    if not files:
+        raise HTTPException(
+            status_code=406,
+            detail="No file(s) uploaded",
+        )
     validate_files(files)
 
     async def _task(file, user_id):
         return handle_file_upload(file, user_id)
 
-    res = await asyncio.gather(*[_task(file, "user_id") for file in files])
+    res = await asyncio.gather(*[_task(file, current_user.user_id) for file in files])
 
     if not all(res):
         raise HTTPException(

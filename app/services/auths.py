@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 FAKE_USERS_DB = {
     "johndoe": {
+        "user_id": "czRvNxms7BeqfbBFWhM_r",
         "username": "johndoe",
         "full_name": "John Doe",
         "email": "johndoe@example.com",
@@ -19,6 +20,7 @@ FAKE_USERS_DB = {
         "disabled": False,
     },
     "alice": {
+        "user_id": "NsvG1aua8Nkl5peDYmips",
         "username": "alice",
         "full_name": "Alice Wonderson",
         "email": "alice@example.com",
@@ -31,6 +33,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 class User(BaseModel):
+    user_id: str
     username: str
     email: str | None = None
     full_name: str | None = None
