@@ -90,6 +90,7 @@ def handle_file_upload(
         FileMeta | False: File metadata or False if failed
     """
     file_id = nanoid.generate()
+    f.file.seek(0)
     md5_hash = md5(f.file.read()).hexdigest()
     file_name = f.filename
     ext = file_name.split(".")[-1]
