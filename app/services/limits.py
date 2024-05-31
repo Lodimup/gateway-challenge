@@ -1,6 +1,6 @@
+from db.clients import rdb
 from fastapi import HTTPException
 from pydantic import validate_call
-from db.clients import rdb
 
 
 @validate_call

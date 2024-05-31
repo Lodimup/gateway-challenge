@@ -3,13 +3,12 @@ from hashlib import md5
 from typing import BinaryIO, Union
 
 import boto3
+import nanoid
 from botocore.client import Config
 from botocore.exceptions import ClientError
-from fastapi import UploadFile
-import nanoid
-from pydantic import validate_call
-
 from db.uploads import IUploads, insert_upload
+from fastapi import UploadFile
+from pydantic import validate_call
 from serializers.ocrs import FileMeta
 from services.env_man import ENVS
 

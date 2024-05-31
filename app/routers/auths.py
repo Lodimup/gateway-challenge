@@ -2,12 +2,11 @@
 Handles authentication routes
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-
 from typing import Annotated
 
-from services.auths import UserInDB, fake_hash_password, FAKE_USERS_DB
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from services.auths import FAKE_USERS_DB, UserInDB, fake_hash_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

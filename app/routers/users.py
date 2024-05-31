@@ -2,11 +2,10 @@
 Handles the user routes
 """
 
-from services.auths import User, get_current_active_user
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
-
-from typing import Annotated
+from services.auths import User, get_current_active_user
 
 router = APIRouter(prefix="/user", tags=["auth"])
 

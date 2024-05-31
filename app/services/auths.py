@@ -4,11 +4,11 @@ See:
 https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/
 """
 
-from fastapi import Depends, HTTPException, status
 from typing import Annotated
+
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-
 
 FAKE_USERS_DB = {
     "johndoe": {

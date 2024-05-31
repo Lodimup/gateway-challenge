@@ -1,8 +1,6 @@
-from routers import ocrs, auths, users
-from services.env_man import ENVS
-
-
 from fastapi import FastAPI
+from routers import auths, ocrs, users
+from services.env_man import ENVS
 
 app = FastAPI(debug=ENVS["DEBUG"])
 app.include_router(ocrs.router)

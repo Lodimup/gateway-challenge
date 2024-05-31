@@ -3,8 +3,8 @@ Handles OCR functionalities, and extractions
 """
 
 import asyncio
-from fastapi import APIRouter, HTTPException, UploadFile
 
+from fastapi import APIRouter, HTTPException, UploadFile
 from serializers.commons import GenericErrorResp
 from serializers.ocrs import UploadPostOut
 from services.storages import handle_file_upload

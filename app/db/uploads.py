@@ -2,8 +2,8 @@
 Handles upload collections
 """
 
-from pydantic import BaseModel
 from db.clients import get_mongo_db
+from pydantic import BaseModel
 
 
 class IUploads(BaseModel):

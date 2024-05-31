@@ -3,4 +3,9 @@
     "python.analysis.extraPaths": [
         "app"
     ],
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    }
 }
