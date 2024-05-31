@@ -42,7 +42,7 @@ def insert_upload(p: IUploads) -> bool:
     return True
 
 
-def get_upload_by(**kwargs) -> IUploads | None:
+def query_upload_by(**kwargs) -> IUploads | None:
     """
     Get an upload record by query params
     Args:
