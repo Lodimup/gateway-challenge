@@ -7,11 +7,13 @@ from typing import Annotated
 
 from constants.limits import UserLimit
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from openai import BaseModel
 from serializers.commons import GenericErrorResp
 from serializers.ocrs import UploadPostOut
 from services.auths import User, get_current_active_user
 from services.limits import is_rate_limited
 from services.storages import handle_file_upload
+from tasks.ocrs import mock_ocr_and_embed_to_pc
 from validators.ocrs import validate_files
 
 # FIXME: prefix should be ocr for namspacing, but let's follow the
@@ -76,3 +78,14 @@ async def post_upload(
         )
 
     return UploadPostOut(files=res)
+
+
+class OcrPostIn(BaseModel):
+    url: str
+    user_id: str
+
+
+@router.post("/ocr")
+def post_ocr(payload: OcrPostIn):
+    res = mock_ocr_and_embed_to_pc(payload.url, payload.user_id)
+    return {"url": payload.url, "user_id": payload.user_id}

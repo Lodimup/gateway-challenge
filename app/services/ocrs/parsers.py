@@ -1,7 +1,17 @@
 from collections import deque
 
-from playground2 import num_tokens_from_string
 from pydantic import BaseModel
+from services.ocrs.utils import num_tokens_from_string
+
+
+class Span(BaseModel):
+    offset: int
+    length: int
+
+
+class BoundingRegion(BaseModel):
+    pageNumber: int
+    polygon: list[float]
 
 
 class Paragraph(BaseModel):
@@ -9,8 +19,8 @@ class Paragraph(BaseModel):
     Represents a paragraph in the OCR result
     """
 
-    spans: list
-    boundingRegions: list
+    spans: list[Span]
+    boundingRegions: list[BoundingRegion]
     content: str
 
 

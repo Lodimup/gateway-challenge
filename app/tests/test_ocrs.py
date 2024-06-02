@@ -2,7 +2,7 @@
 Test cases for tasks.ocrs
 """
 
-from tasks.ocrs import mock_ocr
+from tasks.ocrs import mock_ocr_and_embed_to_pc
 
 
 def test_mock_ocr_success():
@@ -11,7 +11,7 @@ def test_mock_ocr_success():
     """
     url = "https://bucket-dev.lodimup.com/bucket-dev/tektome/uploads/9TMF2cDwGHg1yAz3aNtg_.pdf"
     user_id = "czRvNxms7BeqfbBFWhM_r"
-    r = mock_ocr.s(url, user_id).delay().get()
+    r = mock_ocr_and_embed_to_pc.s(url, user_id).delay().get()
     assert r["data"] is not None
     assert r["error"] is None
 
@@ -22,6 +22,6 @@ def test_mock_ocr_failure():
     """
     url = "https://bucket-dev.lodimup.com/bucket-dev/tektome/uploads/1234.pdf"
     user_id = "czRvNxms7BeqfbBFWhM_r"
-    r = mock_ocr.s(url, user_id).delay().get()
+    r = mock_ocr_and_embed_to_pc.s(url, user_id).delay().get()
     assert r["data"] is None
     assert r["error"] is not None
