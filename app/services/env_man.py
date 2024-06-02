@@ -22,6 +22,7 @@ ENV_NAMES = [
     "AWS_BUCKET_NAME",
     "AWS_ENDPOINT_URL",
     "MONGO_URI",
+    "OPENAI_API_KEY",
 ]
 
 ENVS: dict[str, Any] = {}
