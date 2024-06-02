@@ -2,6 +2,8 @@
 Handles upload collections
 """
 
+from typing import Literal
+
 from db.clients import get_mongo_db
 from pydantic import BaseModel
 
@@ -24,7 +26,7 @@ class IUploads(BaseModel):
     file_name: str
     url: str
     user_id: str
-    did_ocr: bool = False
+    ocr_status: Literal["NOT_STARTED", "PENDING", "SUCCESS"] = "NOT_STARTED"
     schema_version: int
 
 
@@ -56,3 +58,26 @@ def query_upload_by(**kwargs) -> IUploads | None:
         return None
 
     return IUploads(**row)
+
+
+def set_ocr_status(
+    md5: str,
+    user_id: str,
+    status: Literal["NOT_STARTED", "PENDING", "SUCCESS"],
+) -> bool:
+    """
+    Set the ocr status of an upload record
+    Args:
+        md5 (str): md5 hash
+        user_id (str): user id
+        status (Literal["NOT_STARTED", "PENDING", "SUCCESS"]): ocr status
+    Returns:
+        bool: True if successful
+    """
+    uploads_col = get_mongo_db()["uploads"]
+    uploads_col.update_one(
+        {"md5": md5, "user_id": user_id},
+        {"$set": {"ocr_status": status}},
+    )
+
+    return True

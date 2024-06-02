@@ -5,11 +5,12 @@ Handles OCR functionalities, and extractions
 import asyncio
 from typing import Annotated
 
+from celery.result import AsyncResult
 from constants.limits import UserLimit
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from openai import BaseModel
+from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile
+from scheduler import app
 from serializers.commons import GenericErrorResp
-from serializers.ocrs import UploadPostOut
+from serializers.ocrs import OcrPostIn, OcrPostOut, OcrStatusGetOut, UploadPostOut
 from services.auths import User, get_current_active_user
 from services.limits import is_rate_limited
 from services.storages import handle_file_upload
@@ -80,12 +81,20 @@ async def post_upload(
     return UploadPostOut(files=res)
 
 
-class OcrPostIn(BaseModel):
-    url: str
-    user_id: str
-
-
 @router.post("/ocr")
-def post_ocr(payload: OcrPostIn):
-    res = mock_ocr_and_embed_to_pc(payload.url, payload.user_id)
-    return {"url": payload.url, "user_id": payload.user_id}
+def post_ocr(payload: OcrPostIn = Body(...)) -> OcrPostOut:
+    """
+    OCR and embed paragraphs to Pinecone using task queue.
+    - If the file is not uploaded yet, return 404
+    - If the file is uploaded, mock the ocr result and embed to Pinecone
+    - file can only be OCR'd once
+    - while OCR is pending, user can't request another OCR
+    """
+    result = mock_ocr_and_embed_to_pc.s(payload.url, payload.user_id).delay()
+    return {"task_id": result.id}
+
+
+@router.get("/ocr/{task_id}/status")
+def get_ocr_status(task_id: str) -> OcrStatusGetOut:
+    result = AsyncResult(task_id, app=app).status
+    return {"status": result}

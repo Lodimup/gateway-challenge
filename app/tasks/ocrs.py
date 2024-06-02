@@ -4,7 +4,7 @@ from hashlib import md5
 
 import httpx
 from data.data_map import MOCK_DATA_MAP
-from db.uploads import query_upload_by
+from db.uploads import query_upload_by, set_ocr_status
 from pydantic_core import Url
 from scheduler import app
 from services.oai.rags import get_embeddings, insert_embeddings
@@ -40,7 +40,8 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse:
         return ITaskResponse(**ret).model_dump()
 
     md5_hash = md5(r.content).hexdigest()
-    if query_upload_by(md5=md5_hash, user_id=user_id) is None:
+    upload = query_upload_by(md5=md5_hash, user_id=user_id)
+    if upload is None:
         ret = {
             "data": None,
             "error": {
@@ -49,6 +50,16 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse:
             },
         }
         return ITaskResponse(**ret).model_dump()
+    if upload and upload.ocr_status != "NOT_STARTED":
+        ret = {
+            "data": None,
+            "error": {
+                "status_code": 400,
+                "detail": "OCR already done, or in progress",
+            },
+        }
+        return ITaskResponse(**ret).model_dump()
+    set_ocr_status(md5_hash, user_id, "PENDING")
 
     fp = MOCK_DATA_MAP.get(md5_hash)
     with open(fp, "r") as f:
@@ -81,5 +92,5 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse:
             index="default",
             namespace="default",
         )
-
+    set_ocr_status(md5_hash, user_id, "SUCCESS")
     return ITaskResponse(data=data, error=None).model_dump()
