@@ -25,6 +25,10 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
     - When embedding, we chunk the paragraphs into chunks of less than 8000 tokens
     then batch embed
     - vector, and metadata are inserted into Pinecone
+    Note:
+    Storing a lot of metadata in Pinecone may be simple, but more costly.
+    Alternatively, metadata can be stored in local db.
+    More investigations must be done to determine the better approach.
     Args:
         url (Url): url to the file
         user_id (str): user id
@@ -87,6 +91,7 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
                 "user_id": user_id,
                 "md5_hash": md5_hash,
                 "meta": p.model_dump_json(),
+                "model": "text-embedding-3-small",
             }
             metadata.append(meta)
         vectors = get_embeddings(contents)
