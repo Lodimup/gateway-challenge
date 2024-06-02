@@ -82,19 +82,44 @@ async def post_upload(
 
 
 @router.post("/ocr")
-def post_ocr(payload: OcrPostIn = Body(...)) -> OcrPostOut:
+def post_ocr(
+    user: Annotated[User, Depends(get_current_active_user)],
+    payload: OcrPostIn = Body(...),
+) -> OcrPostOut:
     """
     OCR and embed paragraphs to Pinecone using task queue.
-    - If the file is not uploaded yet, return 404
+    Note: Since we do keep document's id in mongodb we can actually implement
+    POST /document/:doc_id/ocr instead of this route
+    It would be more RESTful and user friendly but let's follow the
+    Take Home Assignment's instructions for now.
+    - If the file is not uploaded, being processed, or failed, the status in
+    `AsyncResult(task_id, app=app).get()` will have a not None error object
     - If the file is uploaded, mock the ocr result and embed to Pinecone
     - file can only be OCR'd once
     - while OCR is pending, user can't request another OCR
+    user can be notified immediately if we implement POST /document/:doc_id/ocr
     """
+    if is_rate_limited(f"{user.user_id}:ocr", **UserLimit.OCR):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
     result = mock_ocr_and_embed_to_pc.s(payload.url, payload.user_id).delay()
     return {"task_id": result.id}
 
 
 @router.get("/ocr/{task_id}/status")
-def get_ocr_status(task_id: str) -> OcrStatusGetOut:
+def get_ocr_status(
+    user: Annotated[User, Depends(get_current_active_user)],
+    task_id: str,
+) -> OcrStatusGetOut:
+    """
+    Return the status of the OCR task given the task_id
+    """
+    if is_rate_limited(f"{user.user_id}:core", **UserLimit.CORE):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
     result = AsyncResult(task_id, app=app).status
     return {"status": result}

@@ -13,7 +13,7 @@ from tasks.interfaces import ITaskResponse
 
 
 @app.task
-def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse:
+def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
     """
     Mock OCR and Embed to Pinecone
     Celery task cannot return non-json serializable objects.
@@ -25,6 +25,11 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse:
     - When embedding, we chunk the paragraphs into chunks of less than 8000 tokens
     then batch embed
     - vector, and metadata are inserted into Pinecone
+    Args:
+        url (Url): url to the file
+        user_id (str): user id
+    Returns:
+        dict: response dict in the shape of ITaskResponse
     """
     r = httpx.get(url)
     try:
