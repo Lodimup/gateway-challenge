@@ -5,10 +5,12 @@ Handles OCR functionalities, and extractions
 import asyncio
 from typing import Annotated
 
+from constants.limits import UserLimit
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from serializers.commons import GenericErrorResp
 from serializers.ocrs import UploadPostOut
 from services.auths import User, get_current_active_user
+from services.limits import is_rate_limited
 from services.storages import handle_file_upload
 from validators.ocrs import validate_files
 
@@ -30,7 +32,7 @@ router = APIRouter(
     },
 )
 async def post_upload(
-    current_user: Annotated[User, Depends(get_current_active_user)],
+    user: Annotated[User, Depends(get_current_active_user)],
     files: list[UploadFile],
 ) -> UploadPostOut:
     """
@@ -50,6 +52,11 @@ async def post_upload(
     - Upload the file to a S3 bucket
     - Store file's metadata in mongodb
     """
+    if is_rate_limited(f"{user.user_id}:upload", **UserLimit.UPLOAD):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
     if not files:
         raise HTTPException(
             status_code=406,
@@ -60,7 +67,7 @@ async def post_upload(
     async def _task(file, user_id):
         return handle_file_upload(file, user_id)
 
-    res = await asyncio.gather(*[_task(file, current_user.user_id) for file in files])
+    res = await asyncio.gather(*[_task(file, user.user_id) for file in files])
 
     if not all(res):
         raise HTTPException(
