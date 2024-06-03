@@ -149,6 +149,10 @@ def post_extract(
     - If the file is not uploaded, being processed, or failed return 404
     - `chatbot_response` is natural language response from AI
     - `query_responses` is the raw response from Pinecone
+
+    Note:
+    Embedding of the query can be cached.
+    This entire endpoint can also be cached, depending on the FE use case
     """
     if is_rate_limited(f"{user.user_id}:extract", **UserLimit.EXTRACT):
         raise HTTPException(
