@@ -146,7 +146,7 @@ Note down the id and url
   "task_id": "26ce9f2d-e889-4bc0-93ef-3fccded022e5"
 }
 ```
-- check the status of the task using `/task/{task_id}`
+- check the status of the task using `/ocr/{task_id}/status`
 - once the task is complete you can query the file using `/extract`
 ```json
 {
