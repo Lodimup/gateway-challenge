@@ -32,6 +32,7 @@ System is divided into 5 layers:
 - **Eternal service**: The external layer is responsible for handling external services like Pinecone, OpenAI etc.
 ## Security
 Endpoints are protected by OAuth bearer token and moving window ratelimiting
+The user system is mocked as discussed.
 ## Logging
 - Unhandled exceptions and ERROR level are logged to a file `error.log`
 - Operations that are likely to fail is logged using INFO level
