@@ -47,7 +47,7 @@ def convert_env(env: str, value: str) -> Any:
             return value
 
 
-if os.environ.get("DEPLOYENV") not in ["build", "test"]:
+if os.environ.get("DEPLOYENV") not in ["build"]:
     for env in ENV_NAMES:
         try:
             ENVS[env] = convert_env(env, os.environ[env])
