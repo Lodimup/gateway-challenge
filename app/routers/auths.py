@@ -13,6 +13,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/token")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    """
+    Login using username and password
+    """
     user_dict = FAKE_USERS_DB.get(form_data.username)
     if not user_dict:
         raise HTTPException(

@@ -17,5 +17,8 @@ router = APIRouter(prefix="/user", tags=["auth"])
 async def get_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> User:
+    """
+    Get the current user's info
+    """
 
     return current_user

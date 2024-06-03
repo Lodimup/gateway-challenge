@@ -48,21 +48,23 @@ async def post_upload(
     files: list[UploadFile],
 ) -> UploadPostOut:
     """
-    # Note
-    Take Home Assignment dictates that the endpoint should accept
-    a list of files.<br>
-    However, the endpoint should only accept one file at a time.<br>
-    Multiple files upload should be handled by the client.<br>
-    So, progress bar for each upload is possible.<br>
-
-    This endpoint follows the Take Home Assignment's instructions.
+    Upload a file to S3, and store metadata in mongodb.
 
     # Upload
     - Validate the file(s)
+    - Only sample files are allowed
     - Rename the file to a unique web-safe name
     - Calculate the md5 hash of the file
     - Upload the file to a S3 bucket
     - Store file's metadata in mongodb
+
+    # Note
+    Take Home Assignment dictates that the endpoint should accept
+    a list of files.<br>
+    However, the endpoint is best only accept one file at a time, so<br>
+    multiple files upload should be handled by the client's brower asynchronously<br>
+    So, progress bar for each upload is possible.<br>
+    This endpoint follows the Take Home Assignment's instructions.
     """
     if is_rate_limited(f"{user.user_id}:upload", **UserLimit.UPLOAD):
         raise HTTPException(
@@ -96,7 +98,9 @@ def post_ocr(
     payload: OcrPostIn = Body(...),
 ) -> OcrPostOut:
     """
-    OCR and embed paragraphs to Pinecone using task queue.
+    OCR and embed paragraphs to Pinecone using Celery task queue.
+    Use returned task_id to check the status of the OCR task via GET /ocr/:task_id/status
+
     Note: Since we do keep document's id in mongodb we can actually implement
     POST /document/:doc_id/ocr instead of this route
     It would be more RESTful and user friendly but let's follow the
@@ -104,8 +108,8 @@ def post_ocr(
     - If the file is not uploaded, being processed, or failed, the status in
     `AsyncResult(task_id, app=app).get()` will have a not None error object
     - If the file is uploaded, mock the ocr result and embed to Pinecone
-    - file can only be OCR'd once
-    - while OCR is pending, user can't request another OCR
+    - File can only be OCR'd once
+    - While OCR is pending, user can't request another OCR of the same file
     user can be notified immediately if we implement POST /document/:doc_id/ocr
     """
     if is_rate_limited(f"{user.user_id}:ocr", **UserLimit.OCR):
@@ -123,6 +127,7 @@ def get_ocr_status(
     task_id: str,
 ) -> OcrStatusGetOut:
     """
+    Check the status of the OCR task.
     Return the status of the OCR task given the task_id
     """
     if is_rate_limited(f"{user.user_id}:core", **UserLimit.CORE):
@@ -140,7 +145,7 @@ def post_extract(
     payload: ExtractPostIn = Body(),
 ) -> ExtractPostOut:
     """
-    Extract text from a document.
+    Extract text from a document for a given query.
     - If the file is not uploaded, being processed, or failed return 404
     - `chatbot_response` is natural language response from AI
     - `query_responses` is the raw response from Pinecone
