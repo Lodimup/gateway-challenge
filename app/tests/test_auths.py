@@ -1,3 +1,7 @@
+"""
+Test Auth endpoints
+"""
+
 import httpx
 
 from services.env_man import ENVS

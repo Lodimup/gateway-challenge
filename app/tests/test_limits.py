@@ -1,3 +1,7 @@
+"""
+Test the limits service
+"""
+
 import nanoid
 from services.limits import is_rate_limited
 

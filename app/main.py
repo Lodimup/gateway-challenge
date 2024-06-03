@@ -1,3 +1,7 @@
+"""
+FastAPI entrypoint see: README.md
+"""
+
 from fastapi import FastAPI
 from routers import auths, healths, ocrs, users
 from services import logs  # noqa

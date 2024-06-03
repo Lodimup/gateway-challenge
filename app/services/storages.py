@@ -1,3 +1,7 @@
+"""
+Handles file uploads to S3
+"""
+
 import logging
 from hashlib import md5
 from typing import BinaryIO, Union

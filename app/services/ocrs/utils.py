@@ -1,3 +1,7 @@
+"""
+Contains utility functions for the OCRs module.
+"""
+
 import tiktoken
 
 

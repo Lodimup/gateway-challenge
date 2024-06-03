@@ -1,3 +1,7 @@
+"""
+Handles rate limiting
+"""
+
 from db.clients import rdb
 from fastapi import HTTPException
 from pydantic import validate_call

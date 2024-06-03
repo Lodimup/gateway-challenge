@@ -1,3 +1,7 @@
+"""
+Test DB Classes
+"""
+
 from hashlib import md5
 import nanoid
 from db.uploads import IUploads, insert_upload, query_upload_by, set_ocr_status

@@ -1,3 +1,7 @@
+"""
+Test ChatBot Class
+"""
+
 import pytest
 
 from services.oai.chats import ChatBot

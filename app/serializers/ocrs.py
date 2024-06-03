@@ -1,3 +1,7 @@
+"""
+Handles serializers for ocrs endpoints
+"""
+
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator

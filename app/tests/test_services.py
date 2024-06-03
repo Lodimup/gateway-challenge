@@ -1,3 +1,7 @@
+"""
+Tests for services module.
+"""
+
 from services.storages import get_signed_url
 
 

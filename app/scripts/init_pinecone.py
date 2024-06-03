@@ -1,3 +1,7 @@
+"""
+Script to create a Pinecone index for the RAGS dataset
+"""
+
 import logging
 
 from services.oai.rags import create_index

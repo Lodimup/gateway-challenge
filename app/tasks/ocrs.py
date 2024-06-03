@@ -1,3 +1,8 @@
+"""
+Handles OCR 
+OCR and Embed could be separated into two tasks, but for simplicity, we combine them into one task.
+"""
+
 import json
 import logging
 from collections import deque

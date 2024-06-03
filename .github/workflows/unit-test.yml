@@ -1,3 +1,6 @@
+"""
+GitHub Actions workflow to run unit tests.
+"""
 name: Unit test
 
 on: [push]

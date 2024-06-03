@@ -1,3 +1,7 @@
+"""
+Common tasks response interfaces
+"""
+
 from pydantic import BaseModel, model_validator
 
 

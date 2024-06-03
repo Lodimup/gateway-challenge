@@ -1,3 +1,8 @@
+"""
+Handles application limits
+"""
+
+
 class UserLimit:
     """
     User limits are used to control the number of actions a user can perform

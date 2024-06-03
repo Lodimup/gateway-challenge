@@ -1,3 +1,7 @@
+"""
+Handles parsers for ocrs endpoints. Ensures that the OCR results are validated and ease of use.
+"""
+
 from collections import deque
 
 from pydantic import BaseModel

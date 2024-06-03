@@ -1,3 +1,7 @@
+"""
+Common serializers
+"""
+
 from pydantic import BaseModel
 
 
