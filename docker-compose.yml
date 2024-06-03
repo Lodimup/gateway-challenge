@@ -1,9 +1,17 @@
 # Sample docker compose deployment
 services:
+  nginx:
+    build: 
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "8000:80"
+    depends_on:
+      - gateway
   gateway:
     image: ghcr.io/lodimup/gateway-challenge:latest
-    ports:  # actual deployment should use a reverse proxy, and scale gateway to at least 2
-      - "8000:80"
+    deploy:
+      replicas: 2
     env_file:
       - .env
     depends_on:
