@@ -1,14 +1,15 @@
 """
 Celery task queue scheduler for long running tasks
+TASK_ANNOTATIONS:
+- rate_limit: limits the number of tasks that can be executed per second
+to avoid external service rate limit
 """
 
 from celery import Celery
 from services.env_man import ENVS
 
 TASK_ANNOTATIONS = {
-    # "tasks.ocrs.mock_ocr": {   # TODO: rate limit embedding
-    #     "rate_limit": "10/s"
-    # },  # change to embedding and check actual rate limit
+    "tasks.ocrs.mock_ocr_and_embed_to_pc": {"rate_limit": "10/s"},
 }
 INCLUDE = ["tasks.ocrs"]
 
