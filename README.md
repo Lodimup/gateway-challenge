@@ -32,6 +32,17 @@ System is divided into 5 layers:
 - **Eternal service**: The external layer is responsible for handling external services like Pinecone, OpenAI etc.
 ## Security
 Endpoints are protected by OAuth bearer token and moving window ratelimiting
+## Logging
+- Unhandled exceptions and ERROR level are logged to a file `error.log`
+- Operations that are likely to fail is logged using INFO level
+example
+```
+[2024-06-03 15:05:25,917: INFO/ForkPoolWorker-6] HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+[2024-06-03 15:05:27,497: INFO/ForkPoolWorker-6] user_id='czRvNxms7BeqfbBFWhM_r' md5_hash='be5b625ae79945b5257ccc30a321e984' len(metadata)=54 embedding 14 done
+[2024-06-03 15:05:27,499: INFO/ForkPoolWorker-6] user_id='czRvNxms7BeqfbBFWhM_r' md5_hash='be5b625ae79945b5257ccc30a321e984' len(metadata)=54 inserting 14 started
+[2024-06-03 15:05:31,289: INFO/ForkPoolWorker-6] user_id='czRvNxms7BeqfbBFWhM_r' md5_hash='be5b625ae79945b5257ccc30a321e984' len(metadata)=54 inserting 14 done
+[2024-06-03 15:05:31,290: INFO/ForkPoolWorker-6] user_id='czRvNxms7BeqfbBFWhM_r' md5_hash='be5b625ae79945b5257ccc30a321e984' len(metadata)=66 embedding 15 started
+```
 # Usage
 There is a Makefile for your convenience, check it out for more commands.
 
