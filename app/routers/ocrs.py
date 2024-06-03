@@ -113,7 +113,7 @@ def post_ocr(
             status_code=429,
             detail="Rate limit exceeded",
         )
-    result = mock_ocr_and_embed_to_pc.s(payload.url, payload.user_id).delay()
+    result = mock_ocr_and_embed_to_pc.s(payload.url, user.user_id).delay()
     return {"task_id": result.id}
 
 

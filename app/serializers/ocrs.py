@@ -28,7 +28,6 @@ class UploadPostOut(BaseModel):
 
 class OcrPostIn(BaseModel):
     url: str
-    user_id: str
 
 
 class OcrPostOut(BaseModel):
