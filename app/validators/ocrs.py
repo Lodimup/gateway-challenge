@@ -40,7 +40,7 @@ def validate_files(files: list[UploadFile] = []) -> bool:
         "image/png",
     ]
     MAX_FILES = 5
-    MAX_SIZE = 10 * 1024 * 1024  # 10MB
+    MAX_SIZE = 100 * 1024 * 1024  # 10MB
 
     if len(files) > MAX_FILES:
         raise HTTPException(
