@@ -1,0 +1,44 @@
+# Sample docker compose deployment
+services:
+  gateway:
+    image: ghcr.io/lodimup/gateway-challenge:latest
+    ports:  # actual deployment should use a reverse proxy, and scale gateway to at least 2
+      - "8000:80"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+      - redis
+      - worker
+    healthcheck:
+      test: curl --fail http://localhost:80/health/live || exit 1
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  worker:
+    image: ghcr.io/lodimup/gateway-challenge:latest
+    env_file:
+      - .env
+    entrypoint: >
+      sh -c 'celery -A scheduler worker -l INFO'
+    deploy:
+      replicas: 2
+    depends_on:
+      - mongo
+      - redis
+
+  # 27017 default port for MongoDB
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mongodb-data:/data/db
+
+  # 6379 default port for Redis
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+
+volumes:
+  mongodb-data:

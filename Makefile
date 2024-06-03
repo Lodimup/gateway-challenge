@@ -21,4 +21,7 @@ test-docker: test-build test-run
 test-build:
 	docker build -t gateway:latest .
 test-run:
-	docker run -p 8080:80 --env-file .env gateway:latest 
+	docker run -p 8080:80 --env-file .env gateway:latest
+# Run all services in docker-compose
+compose-up:
+	docker-compose up -d
