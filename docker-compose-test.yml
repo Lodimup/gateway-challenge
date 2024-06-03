@@ -7,7 +7,7 @@ services:
     depends_on:
       - gateway
     env_file:
-      - .env
+      - .env.actions
     entrypoint: >
       sh -c 'pytest -v -n auto'
   nginx:
@@ -25,7 +25,7 @@ services:
     deploy:
       replicas: 1
     env_file:
-      - .env
+      - .env.actions
     depends_on:
       - mongo
       - redis
@@ -41,7 +41,7 @@ services:
       context: .
       dockerfile: Dockerfile
     env_file:
-      - .env
+      - .env.actions
     entrypoint: >
       sh -c 'celery -A scheduler worker -l INFO'
     deploy:
