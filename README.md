@@ -30,6 +30,8 @@ System is divided into 5 layers:
 - **Service**: The service is responsible for processing the request. It can call other services or the database. Ihis include task queue.
 - **Store**: The database is responsible for storing and retrieval of the data.
 - **Eternal service**: The external layer is responsible for handling external services like Pinecone, OpenAI etc.
+## Security
+Endpoints are protected by OAuth bearer token and moving window ratelimiting
 # Usage
 There is a Makefile for your convenience, check it out for more commands.
 
@@ -39,6 +41,7 @@ There is a Makefile for your convenience, check it out for more commands.
 pinecone database can be initialized with the following command once
 ```
 python scripts/init_pinecone.py
+```
 ```
 make compose-up
 ```
@@ -85,3 +88,85 @@ To deploy to production you can use `docker-compose.yml` as a template
 
 # Endpoints
 Automatic documentation, and example usage is available at [http://localhost:8000/docs](http://localhost:8000/docs) locally and [https://gateway.lodimup.com/docs](https://gateway.lodimup.com/docs) on cloud.
+
+Using the api
+- start with logging in by clicking Authorize on the top right of https://gateway.lodimup.com/docs
+use username: `johndoe` password will be given to you via email. This is essentially obtaining a bearer token
+- upload a file using `/upload`
+you will receive a response
+```json
+{
+  "files": [
+    {
+      "id": "DEVAjDtXec-Qao8dKqzw6",
+      "ext": "pdf",
+      "md5": "99ef153b76c24ee4703f3b9e025bab09",
+      "file_name": "東京都建築安全条例.pdf",
+      "url": "https://0d7d94b1ba744108db383f...ae0a74eb80508821b4e29a67de56f40f5",
+      "user_id": "czRvNxms7BeqfbBFWhM_r"
+    }
+  ]
+}
+```
+Note down the id and url
+- order an ocr using `/ocr` this will mock ocr as well as embed using OpenAI and store result to pinecone
+```json
+{
+  "url": <url> from previous step
+}
+```
+- you will receive a task_id
+```json
+{
+  "task_id": "26ce9f2d-e889-4bc0-93ef-3fccded022e5"
+}
+```
+- check the status of the task using `/task/{task_id}`
+- once the task is complete you can query the file using `/extract`
+```json
+{
+  "query": "第一節の二 適用区域(第一条の二)",
+  "file_id": <id from /upload>
+}
+```
+you will receive a response
+which chatbot_response is in natural langauge and query_responses are the results
+
+```json
+{ 
+  "chatbot_response": "The first result is found on page 1 and has the following span: offset 125, length 17. The content of this result is \"第一節の二 適用区域(第一条の二)\".\n\nThe second result is also found on page 1 and has the following span: offset 143, length 17. The content of this result is \"第一節の三 適用除外(第一条の三)\".\n\nThe third result is found on page 2 and has the following span: offset 1126, length 67. The content of this result is \"(昭三五条例四四 · 昭四七条例六一 ·昭六二条例七四 · 平一五条例三二 · 平三〇条 例九七 · 一部改正) 第一節の二 適用区域\".",
+  "query_responses": [
+    {
+      "id": "YrMqzzOzR5cQmEKLNTWW4",
+      "score": 0.999999464,
+      "metadata": {
+        "md5_hash": "99ef153b76c24ee4703f3b9e025bab09",
+        "meta": "{\"spans\":[{\"offset\":125,\"length\":17}],\"boundingRegions\":[{\"pageNumber\":1,\"polygon\":[1.4449,3.9391,3.7618,3.9391,3.7618,4.1115,1.4449,4.1115]}],\"content\":\"第一節の二 適用区域(第一条の二)\"}",
+        "user_id": "czRvNxms7BeqfbBFWhM_r",
+        "model": "text-embedding-3-small"
+      }
+    },
+    {
+      "id": "ks7gqK1MQyRvNNfBQmNNE",
+      "score": 0.76601392,
+      "metadata": {
+        "md5_hash": "99ef153b76c24ee4703f3b9e025bab09",
+        "meta": "{\"spans\":[{\"offset\":143,\"length\":17}],\"boundingRegions\":[{\"pageNumber\":1,\"polygon\":[1.4601,4.1926,3.7669,4.1926,3.7669,4.3599,1.4601,4.3599]}],\"content\":\"第一節の三 適用除外(第一条の三)\"}",
+        "user_id": "czRvNxms7BeqfbBFWhM_r",
+        "model": "text-embedding-3-small"
+      }
+    },
+    {
+      "id": "nVtnsFJesIsjKI2uXHcYG",
+      "score": 0.733506,
+      "metadata": {
+        "md5_hash": "99ef153b76c24ee4703f3b9e025bab09",
+        "meta": "{\"spans\":[{\"offset\":1126,\"length\":67}],\"boundingRegions\":[{\"pageNumber\":2,\"polygon\":[1.7386,5.7237,7.0775,5.7186,7.0782,6.3842,1.7392,6.3892]}],\"content\":\"(昭三五条例四四 · 昭四七条例六一 ·昭六二条例七四 · 平一五条例三二 · 平三〇条 例九七 · 一部改正) 第一節の二 適用区域\"}",
+        "user_id": "czRvNxms7BeqfbBFWhM_r",
+        "model": "text-embedding-3-small"
+      }
+    }
+  ]
+}
+```
+</details>
