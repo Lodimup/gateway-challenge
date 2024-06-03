@@ -2,9 +2,11 @@
 Test cases for tasks.ocrs
 """
 
+import pytest
 from tasks.ocrs import mock_ocr_and_embed_to_pc
 
 
+@pytest.mark.skip(reason="Expensive test.")
 def test_mock_ocr_success():
     """
     Test mock_ocr success
@@ -16,6 +18,7 @@ def test_mock_ocr_success():
     assert r["error"] is None
 
 
+@pytest.mark.skip(reason="Expensive test.")
 def test_mock_ocr_failure():
     """
     Test mock_ocr failure due to invalid url

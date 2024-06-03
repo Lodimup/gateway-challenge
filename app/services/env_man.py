@@ -9,7 +9,7 @@ import os
 from typing import Any
 
 ENV_NAMES = [
-    "DEPLOYENV",  # build, dev, prod
+    "DEPLOYENV",  # build, dev, prod, test
     "DEBUG",
     "CELERY_BROKER",
     "CELERY_BACKEND",

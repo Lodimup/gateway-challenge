@@ -26,3 +26,7 @@ test-run:
 compose-up:
 	docker pull ghcr.io/lodimup/gateway-challenge:latest
 	docker-compose up -d
+# test all services in docker-compose, success should be exit code 0
+compose-test:
+	docker compose -f docker-compose-test.yml up --abort-on-container-exit --build --force-recreate
+	docker compose -f docker-compose-test.yml down --volumes

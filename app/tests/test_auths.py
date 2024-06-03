@@ -1,6 +1,12 @@
 import httpx
 
-client = httpx.Client(base_url="http://localhost:8000")
+from services.env_man import ENVS
+
+base_url = "http://localhost:8000"
+if ENVS.get("DEPLOYENV") == "test":
+    base_url = "http://nginx:80"
+
+client = httpx.Client(base_url=base_url)
 
 
 def test_auth_success():
