@@ -2,6 +2,7 @@
 Test Auth endpoints
 """
 
+import os
 import httpx
 
 from services.env_man import ENVS
@@ -18,7 +19,7 @@ def test_auth_success():
         "/auth/token",
         data={
             "username": "johndoe",
-            "password": "secret",
+            "password": "secret" + os.getenv("FAKE_SECRET_SUFFIX", ""),
         },
     )
 

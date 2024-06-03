@@ -4,6 +4,7 @@ See:
 https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/
 """
 
+import os
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -16,7 +17,7 @@ FAKE_USERS_DB = {
         "username": "johndoe",
         "full_name": "John Doe",
         "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
+        "hashed_password": "fakehashedsecret" + os.getenv("FAKE_SECRET_SUFFIX", ""),
         "disabled": False,
     },
     "alice": {
