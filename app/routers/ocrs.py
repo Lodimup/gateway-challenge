@@ -7,12 +7,21 @@ from typing import Annotated
 
 from celery.result import AsyncResult
 from constants.limits import UserLimit
+from db.uploads import query_upload_by
 from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile
 from scheduler import app
 from serializers.commons import GenericErrorResp
-from serializers.ocrs import OcrPostIn, OcrPostOut, OcrStatusGetOut, UploadPostOut
+from serializers.ocrs import (
+    ExtractPostIn,
+    ExtractPostOut,
+    OcrPostIn,
+    OcrPostOut,
+    OcrStatusGetOut,
+    UploadPostOut,
+)
 from services.auths import User, get_current_active_user
 from services.limits import is_rate_limited
+from services.oai.rags import get_ai_response
 from services.storages import handle_file_upload
 from tasks.ocrs import mock_ocr_and_embed_to_pc
 from validators.ocrs import validate_files
@@ -123,3 +132,37 @@ def get_ocr_status(
         )
     result = AsyncResult(task_id, app=app).status
     return {"status": result}
+
+
+@router.post("/extract")
+def post_extract(
+    user: Annotated[User, Depends(get_current_active_user)],
+    payload: ExtractPostIn = Body(),
+) -> ExtractPostOut:
+    """
+    Extract text from a document.
+    - If the file is not uploaded, being processed, or failed return 404
+    - `chatbot_response` is natural language response from AI
+    - `query_responses` is the raw response from Pinecone
+    """
+    if is_rate_limited(f"{user.user_id}:extract", **UserLimit.EXTRACT):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
+    upload = query_upload_by(
+        user_id=user.user_id,
+        id=payload.file_id,
+        ocr_status="SUCCESS",
+    )
+    if upload is None:
+        raise HTTPException(
+            status_code=404,
+            detail="File not found or OCR not done",
+        )
+    resp = get_ai_response(
+        payload.query,
+        user.user_id,
+        upload.md5,
+    )
+    return resp
