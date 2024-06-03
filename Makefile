@@ -24,4 +24,5 @@ test-run:
 	docker run -p 8080:80 --env-file .env gateway:latest
 # Run all services in docker-compose
 compose-up:
+	docker pull ghcr.io/lodimup/gateway-challenge:latest
 	docker-compose up -d
