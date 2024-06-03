@@ -24,5 +24,6 @@ rdb = Redis(
     host=ENVS["CACHE_REDIS_HOST"],
     port=ENVS["CACHE_REDIS_PORT"],
     db=ENVS["CACHE_REDIS_DB"],
+    password=ENVS["CACHE_REDIS_PASSWORD"],
     decode_responses=True,
 )
