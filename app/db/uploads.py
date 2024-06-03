@@ -27,7 +27,9 @@ class IUploads(BaseModel):
     file_name: str
     url: str
     user_id: str
-    ocr_status: Literal["NOT_STARTED", "PENDING", "SUCCESS"] = "NOT_STARTED"
+    ocr_status: Literal["NOT_STARTED", "PENDING", "IN_PROGRESS", "SUCCESS"] = (
+        "NOT_STARTED"
+    )
     schema_version: int
 
 

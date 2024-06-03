@@ -77,7 +77,7 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
             },
         }
         return ITaskResponse(**ret).model_dump()
-    set_ocr_status(md5_hash, user_id, "PENDING")
+    set_ocr_status(md5_hash, user_id, "IN_PROGRESS")
 
     fp = MOCK_DATA_MAP.get(md5_hash)
     with open(fp, "r") as f:
