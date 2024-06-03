@@ -10,8 +10,9 @@ import boto3
 import nanoid
 from botocore.client import Config
 from botocore.exceptions import ClientError
+from data.data_map import MOCK_DATA_MAP
 from db.uploads import IUploads, insert_upload
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile
 from pydantic import validate_call
 from serializers.ocrs import FileMeta
 from services.env_man import ENVS
@@ -99,6 +100,12 @@ def handle_file_upload(
     file_name = f.filename
     ext = file_name.split(".")[-1]
     key = f"{namespace}/{file_id}.{ext}"
+
+    if md5_hash not in MOCK_DATA_MAP.keys():
+        raise HTTPException(
+            status_code=413,
+            detail="Only sample files are allowed for upload",
+        )
 
     try:
         f.file.seek(0)

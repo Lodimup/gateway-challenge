@@ -17,6 +17,7 @@ class IUploads(BaseModel):
     filename: original filename
     url: cdn url
     user_id: owner's user id
+    ocr_status: ocr status
     schema_version: schema version number for future changes
     """
 
