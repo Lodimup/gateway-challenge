@@ -75,7 +75,7 @@ class OcrResult(BaseModel):
     @staticmethod
     def yield_paragraphs(
         queue: deque[Paragraph],
-        max_token: int = 8000,
+        max_token: int = 4000,
         encoding_name: str = "cl100k_base",
     ) -> list[Paragraph]:
         """
