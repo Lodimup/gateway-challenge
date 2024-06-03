@@ -1,4 +1,5 @@
 import json
+import logging
 from collections import deque
 from hashlib import md5
 
@@ -10,6 +11,8 @@ from scheduler import app
 from services.oai.rags import get_embeddings, insert_embeddings
 from services.ocrs.parsers import OcrResult, Paragraph
 from tasks.interfaces import ITaskResponse
+
+logger = logging.getLogger(__name__)
 
 
 @app.task
@@ -25,6 +28,7 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
     - When embedding, we chunk the paragraphs into chunks of less than 8000 tokens
     then batch embed
     - vector, and metadata are inserted into Pinecone
+    - logging to track the procress where it is likely to fail
     Note:
     Storing a lot of metadata in Pinecone may be simple, but more costly.
     Alternatively, metadata can be stored in local db.
@@ -82,7 +86,8 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
     bundled_paragraphs: list[Paragraph] = []
     while queue:
         bundled_paragraphs.append(OcrResult.yield_paragraphs(queue))
-    for bundle in bundled_paragraphs:
+    logger.info(f"{user_id=} {md5_hash=} {len(bundled_paragraphs)=} task started")
+    for i, bundle in enumerate(bundled_paragraphs):
         contents = [p.content for p in bundle]
         metadata = []
         for p in bundle:
@@ -94,13 +99,19 @@ def mock_ocr_and_embed_to_pc(url: Url, user_id: str) -> ITaskResponse.from_orm:
                 "model": "text-embedding-3-small",
             }
             metadata.append(meta)
+        logger.info(f"{user_id=} {md5_hash=} {len(metadata)=} embedding {i} started")
         vectors = get_embeddings(contents)
+        logger.info(f"{user_id=} {md5_hash=} {len(metadata)=} embedding {i} done")
         vectors = [v.model_dump() for v in vectors]
+        logger.info(f"{user_id=} {md5_hash=} {len(metadata)=} inserting {i} started")
         data = insert_embeddings(
             vectors,
             metadata,
             index="default",
             namespace="default",
         )
+        logger.info(f"{user_id=} {md5_hash=} {len(metadata)=} inserting {i} done")
+    logger.info(f"{user_id=} {md5_hash=} {len(bundled_paragraphs)=} task done")
     set_ocr_status(md5_hash, user_id, "SUCCESS")
+
     return ITaskResponse(data=data, error=None).model_dump()
