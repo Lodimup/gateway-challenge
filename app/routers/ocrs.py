@@ -145,6 +145,11 @@ def post_extract(
     - `chatbot_response` is natural language response from AI
     - `query_responses` is the raw response from Pinecone
     """
+    if is_rate_limited(f"{user.user_id}:extract", **UserLimit.EXTRACT):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded",
+        )
     upload = query_upload_by(
         user_id=user.user_id,
         id=payload.file_id,
