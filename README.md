@@ -49,13 +49,21 @@ There is a Makefile for your convenience, check it out for more commands.
 **Running services locally requires**
 - docker
 - GNU Make
+- .env file with correct values
 pinecone database can be initialized with the following command once
 ```
 python scripts/init_pinecone.py
 ```
+then, you can start the services with
 ```
 make compose-up
 ```
+the following services will go online:
+- gateway
+- worker
+- redis
+- mongodb
+
 Access the API at `http://localhost:8000/docs`
 **Running tests**
 ```
@@ -77,6 +85,11 @@ lsb_release -a
 Once in container you can start dev server with
 ```
 fastapi dev
+```
+You should also start a worker if features you're working on requires it
+You can force workload to run on fastapi, by setting `CELERY_ALWAYS_EAGER=True`.
+```
+make worker
 ```
 You can run unit tests locally with
 ```
