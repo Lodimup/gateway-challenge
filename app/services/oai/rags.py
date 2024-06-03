@@ -184,4 +184,7 @@ def get_ai_response(
 
     chatbot_resp = chatbot.chat(json.dumps(reduced_metas, ensure_ascii=False))
 
-    return {"chatbot_response": chatbot_resp, "query_response": query_resp}
+    return {
+        "chatbot_response": chatbot_resp,
+        "query_responses": [r.to_dict() for r in query_resp["matches"]],
+    }
