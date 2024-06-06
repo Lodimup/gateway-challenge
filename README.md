@@ -1,5 +1,5 @@
 # Gateway Challenge
-The application is live at [https://gateway.lodimup.com/docs](https://gateway.lodimup.com/docs)
+The application is live at `[https://gateway.lodimup.com/docs](https://gateway.lodimup.com/docs)` The app is now offline.
 - file upload apart from provided sample files are disabled
 # System Design
 ![System Design](./img/system-design.png)
