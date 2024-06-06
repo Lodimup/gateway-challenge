@@ -22,7 +22,7 @@ app = Celery(
     task_annotations=TASK_ANNOTATIONS,
 )
 app.conf.update(
-    task_concurrency=4,  # allows 4 tasks to run concurrently per worker
+    task_concurrency=1,  # allows x tasks to run concurrently per worker
     worker_prefetch_multiplier=1,  # allows 1 task to be prefetched per worker
 )
 
